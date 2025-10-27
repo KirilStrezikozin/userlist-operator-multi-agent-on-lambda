@@ -1,0 +1,19 @@
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  user-data-fetch-container:
+    permissions:
+      contents: read
+      id-token: write
+
+    uses: ./.github/workflows/container.yml
+    with:
+      dockerfile: lib/action_groups/user_data_fetch/Dockerfile
+      image_repository: userlist-operator-multi-agent-on-lambda/user_data_fetch_function
+      image_tag: latest-arm
+      aws_region: ${{ vars.AWS_REGION }}
+    secrets:
+      aws_iam_role: ${{ secrets.AWS_IAM_ROLE }}
