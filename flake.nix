@@ -45,7 +45,10 @@
             terraform-lsp
           ];
 
-          shellHook = ''		'';
+          shellHook = ''
+          uv sync
+          source ./.venv/bin/activate
+          '';
         };
       });
 

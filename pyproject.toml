@@ -1,0 +1,11 @@
+[project]
+name = "userlist-operator-multi-agent-on-lambda"
+version = "0.1.0"
+description = "Simple multi-agent (orchestrator + sub-agents) user list management and processing."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aws-lambda-powertools>=3.22.0",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+]
