@@ -19,6 +19,6 @@ FROM public.ecr.aws/lambda/python:3.12
 
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 
-COPY ./src ${LAMBDA_TASK_ROOT}/src
+COPY ./src/ ${LAMBDA_TASK_ROOT}/
 
-CMD ["src.lambdas.userlist_operator.lambda_handler"]
+CMD ["lambdas.userlist_operator.app.lambda_handler"]
