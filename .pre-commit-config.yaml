@@ -1,0 +1,16 @@
+repos:
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.103.0
+  hooks:
+    - id: terraform_fmt
+      args: [ "infra" ]
+- repo: https://github.com/terraform-docs/terraform-docs
+  rev: "v0.20.0"
+  hooks:
+    - id: terraform-docs-go
+      args: ["markdown", "table", "--output-file", "README.md", "./infra"]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.13.3
+  hooks:
+    - id: ruff-check
+    - id: ruff-format
