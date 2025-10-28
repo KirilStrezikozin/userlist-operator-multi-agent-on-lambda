@@ -1,3 +1,4 @@
+name: Deploy
 on:
   push:
     branches: [ main ]
@@ -5,12 +6,20 @@ on:
 
 env:
   REPOSITORY_NAME: ${{ github.event.repository.name }}
+  TF_ACTIONS_WORKING_DIR: infra
+
+  TF_CLOUD_ORGANIZATION: "kemplerdev"
+  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+  TF_WORKSPACE: "github-actions"
 
 jobs:
   build-container-and-push-to-ecr:
     runs-on: ubuntu-24.04-arm
     permissions:
       id-token: write
+
+    outputs:
+      image_uri: ${{ steps.build-and-push-image.outputs.image_uri }}
 
     steps:
       - name: Checkout repo
@@ -27,12 +36,74 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, tag, and push docker image to Amazon ECR
+        id: build-and-push-image
         env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ env.REPOSITORY_NAME }}
-          IMAGE_TAG: latest
+          IMAGE_URI: ${{ steps.login-ecr.outputs.registry }}/${{ env.REPOSITORY_NAME }}:latest
         run: |
           docker buildx build \
             --file Dockerfile \
-            --platform linux/arm64 -t $REGISTRY/$REPOSITORY:$IMAGE_TAG \
+            --platform linux/arm64 -t $IMAGE_URI \
             --push .
+
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+  validate-and-create-infra:
+    needs: build-container-and-push-to-ecr
+    runs-on: ubuntu-latest
+    defaults:
+       run:
+         working-directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform fmt
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+
+    - name: Terraform Init
+      id: init
+      run: terraform init -input=false
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
+    - name: Write terraform.tfvars
+      run: |
+        cat > terraform.tfvars <<'EOF'
+        aws_region = "${{ vars.AWS_REGION }}"
+        userlist_operator_function_image_uri = "${{ needs.build-container-and-push-to-ecr.outputs.image_uri }}"
+        EOF
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color -input=false -var-file terraform.tfvars
+
+    - name: Upload Configuration
+      uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+      id: apply-upload
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        directory: ${{ env.TF_ACTIONS_WORKING_DIR }}
+
+    - name: Create Apply Run
+      uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+      id: apply-run
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+
+    - name: Apply
+      uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
+      if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
+      id: apply
+      with:
+        run: ${{ steps.apply-run.outputs.run_id }}
+        comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
