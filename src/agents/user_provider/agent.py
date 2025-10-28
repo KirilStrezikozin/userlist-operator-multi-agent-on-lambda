@@ -9,5 +9,5 @@ model = get_model()
 userlist_summary_agent = Agent(
     model=model,
     system_prompt=system_prompt,
-    callback_handler=None,
+    # callback_handler=None,
 )

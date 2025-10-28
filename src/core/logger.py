@@ -2,7 +2,7 @@ import logging
 
 from aws_lambda_powertools import Logger
 
-agent_logger = Logger()
+logger = Logger()
 
 # Configure the root strands logger
 logging.getLogger("strands").setLevel(logging.INFO)

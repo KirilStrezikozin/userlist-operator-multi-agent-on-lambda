@@ -1,9 +1,10 @@
 from collections.abc import Sequence
+from typing import TypedDict
 
 from .base import Base
 
 
-class User(Base):
+class User(TypedDict):
     id: int
     name: str
     age: int
@@ -11,7 +12,7 @@ class User(Base):
 
 
 class Users(Base):
-    users: Sequence[User]
+    users: Sequence[dict]
 
 
 class UserDataFetchResult(Users):
@@ -19,4 +20,4 @@ class UserDataFetchResult(Users):
 
 
 class UserFilterResult(Base):
-    filtered_users: Sequence[User]
+    filtered_users: Sequence[dict]
