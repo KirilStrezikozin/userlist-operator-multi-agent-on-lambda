@@ -40,6 +40,9 @@
             terraform-providers.aws
             awscli2
 
+            pre-commit
+            terraform-docs
+
             pyright
             nixd
             terraform-lsp
