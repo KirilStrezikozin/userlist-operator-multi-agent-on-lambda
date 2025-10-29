@@ -40,6 +40,7 @@
             terraform-providers.aws
             awscli2
 
+            jq
             pre-commit
             terraform-docs
 
