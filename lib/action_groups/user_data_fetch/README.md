@@ -1,20 +1,45 @@
 # UserDataFetch Action Group
 
-# Docker
-
-Build an ARM container:
+## Generate OpenAPI schema
 
 ```sh
-docker buildx build --platform linux/arm64 --provenance=false -t user_data_fetch_function:latest-arm --file lib/action_groups/user_data_fetch/Dockerfile . --load
+cd lib/action_groups/user_data_fetch # if in project's root
+uv run -m scripts.generate_schema | jq > openapi.json
 ```
 
-Build an x86_64 container:
+## Docker
+
+Make sure you run the `docker` commands below from the project's root directory.
+
+1. Build an Arm container:
 
 ```sh
-docker buildx build --platform linux/amd64 --provenance=false -t user_data_fetch_function:latest-x86_64 --file lib/action_groups/user_data_fetch/Dockerfile . --build-arg ARM= --load
+echo "Building for Arm..."
+docker buildx build \
+    --platform linux/arm64 \
+    --provenance=false \
+    -t user_data_fetch_function:latest-arm \
+    --file lib/action_groups/user_data_fetch/Dockerfile \
+    --build-arg PLATFORM_TAG=-arm64 \
+    --load \
+    .
 ```
 
-# Testing
+2. Or build an Intel/AMD container:
+
+```sh
+echo "Building for x86_64..."
+docker buildx build \
+    --platform linux/amd64 \
+    --provenance=false \
+    -t user_data_fetch_function:latest-x86_64 \
+    --file lib/action_groups/user_data_fetch/Dockerfile \
+    --build-arg PLATFORM_TAG=-x86_64 \
+    --load \
+    .
+```
+
+## Testing
 
 Example response:
 

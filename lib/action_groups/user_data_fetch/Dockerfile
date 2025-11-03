@@ -1,5 +1,9 @@
-ARG ARM=true
-ARG BASE_IMAGE=public.ecr.aws/lambda/python:3.12${ARM:+-arm64} AS builder
+ARG SERVICE_NAME="user_data_fetch_function"
+ARG NAMESPACE="UserDataFetch"
+ARG LOG_LEVEL="INFO"
+
+ARG PLATFORM_TAG
+ARG BASE_IMAGE="public.ecr.aws/lambda/python:3.12${PLATFORM_TAG}"
 
 FROM ghcr.io/astral-sh/uv:0.9.5 AS uv
 
@@ -18,9 +22,13 @@ RUN --mount=from=uv,source=/uv,target=/bin/uv \
 
 FROM ${BASE_IMAGE}
 
-ENV POWERTOOLS_SERVICE_NAME="user_data_fetch_function"
-ENV POWERTOOLS_METRICS_NAMESPACE="UserDataFetch"
-ENV POWERTOOLS_LOG_LEVEL="INFO"
+ARG SERVICE_NAME
+ARG NAMESPACE
+ARG LOG_LEVEL
+
+ENV POWERTOOLS_SERVICE_NAME="${SERVICE_NAME}"
+ENV POWERTOOLS_METRICS_NAMESPACE="${NAMESPACE}"
+ENV POWERTOOLS_LOG_LEVEL="${LOG_LEVEL}"
 
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 
