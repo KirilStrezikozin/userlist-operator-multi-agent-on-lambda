@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from pydantic import BaseModel, ConfigDict
 
 
@@ -15,8 +13,8 @@ class User(Base):
 
 
 class Users(Base):
-    users: Sequence[User]
+    users: list[User]
 
 
-class UsersSummaryRequest(Users):
-    pass
+class UsersSummaryRequest(Base):
+    users: list[User]

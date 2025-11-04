@@ -34,8 +34,9 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Users",
-                  "description": "List of users"
+                  "type": "string",
+                  "title": "Return",
+                  "description": "JSON payload with a list of users"
                 }
               }
             }
@@ -52,12 +53,12 @@
         "description": "Generate a summary of a list of users",
         "operationId": "make_summary_summary_post",
         "requestBody": {
-          "description": "List of users",
+          "description": "JSON payload with a list of users",
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UsersSummaryRequest",
-                "description": "List of users"
+                "description": "JSON payload with a list of users"
               }
             }
           },
@@ -132,22 +133,6 @@
           "city"
         ],
         "title": "User"
-      },
-      "Users": {
-        "properties": {
-          "users": {
-            "items": {
-              "$ref": "#/components/schemas/User"
-            },
-            "type": "array",
-            "title": "Users"
-          }
-        },
-        "type": "object",
-        "required": [
-          "users"
-        ],
-        "title": "Users"
       },
       "UsersSummaryRequest": {
         "properties": {

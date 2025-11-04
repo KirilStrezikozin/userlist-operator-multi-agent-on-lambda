@@ -1,15 +1,15 @@
 from http import HTTPStatus
 from typing import Annotated
+
 from aws_lambda_powertools.event_handler.openapi.params import Body
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
-from lib.action_groups.user_filter.app.schemas import (
+from .app import app, logger, tracer
+from .schemas import (
     FilterUsersRequest,
     FilterUsersResponse,
 )
-from lib.action_groups.user_filter.app.tools import filter_users_tool
-
-from .app import app, logger, tracer
+from .tools import filter_users_tool
 
 
 @app.post(

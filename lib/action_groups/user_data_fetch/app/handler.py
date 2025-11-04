@@ -3,7 +3,7 @@ from aws_lambda_powertools.event_handler.openapi.params import Body
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
 from .tools import get_users_tool, make_summary_tool
-from .schemas import Users, UsersSummaryRequest
+from .schemas import UsersSummaryRequest
 
 from .app import app, logger, tracer
 
@@ -14,9 +14,11 @@ from .app import app, logger, tracer
     tags=["users"],
 )
 @tracer.capture_method
-def get_users() -> Annotated[Users, Body(description="List of users")]:
+def get_users() -> Annotated[
+    str, Body(description="JSON payload with a list of users")
+]:
     logger.info("Serving get_users")
-    return get_users_tool()
+    return get_users_tool().model_dump_json()
 
 
 @app.post(
@@ -26,13 +28,16 @@ def get_users() -> Annotated[Users, Body(description="List of users")]:
 )
 @tracer.capture_method
 def make_summary(
-    request: Annotated[UsersSummaryRequest, Body(description="List of users")],
+    users: Annotated[
+        UsersSummaryRequest, Body(description="JSON payload with a list of users")
+    ],
 ) -> Annotated[str, Body(description="Summary of the list of users")]:
     logger.info("Serving make_summary")
-    return make_summary_tool(request)
+    return make_summary_tool(users)
 
 
 @logger.inject_lambda_context
 @tracer.capture_lambda_handler
 def lambda_handler(event: dict, context: LambdaContext):
+    logger.info(event)
     return app.resolve(event, context)
