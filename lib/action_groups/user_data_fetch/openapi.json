@@ -42,6 +42,52 @@
           }
         }
       }
+    },
+    "/summary": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "POST /summary",
+        "description": "Generate a summary of a list of users",
+        "operationId": "make_summary_summary_post",
+        "requestBody": {
+          "description": "List of users",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsersSummaryRequest",
+                "description": "List of users"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "Return",
+                  "description": "Summary of the list of users"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -102,6 +148,22 @@
           "users"
         ],
         "title": "Users"
+      },
+      "UsersSummaryRequest": {
+        "properties": {
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/User"
+            },
+            "type": "array",
+            "title": "Users"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "title": "UsersSummaryRequest"
       },
       "ValidationError": {
         "properties": {

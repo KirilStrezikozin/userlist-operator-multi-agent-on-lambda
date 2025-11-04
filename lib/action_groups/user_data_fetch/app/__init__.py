@@ -1,9 +1,9 @@
 __all__ = [
     "app",
     "lambda_handler",
-    "get_users",
 ]
+
+# Ensure all handlers are imported for script discovery.
 
 from .app import app
 from .handler import lambda_handler
-from .tools import get_users

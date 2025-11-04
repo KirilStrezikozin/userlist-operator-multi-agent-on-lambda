@@ -1,20 +1,7 @@
-from typing import Annotated
-
-from aws_lambda_powertools.event_handler.openapi.params import Body
-
-from .app import app, logger, tracer
-from .schemas import User, Users
+from .schemas import User, Users, UsersSummaryRequest
 
 
-@app.get(
-    "/users",
-    description="Fetches a list of users with their information from a database",
-    tags=["users"],
-)
-@tracer.capture_method
-def get_users() -> Annotated[Users, Body(description="List of users")]:
-    logger.info("Serving get_users")
-
+def get_users_tool() -> Users:
     # TODO: query a real db
     users = Users(
         users=[
@@ -27,17 +14,9 @@ def get_users() -> Annotated[Users, Body(description="List of users")]:
     return users
 
 
-@app.get(
-    "/summary",
-    description="Generate a summary of a list of users",
-    tags=["users"],
-)
-@tracer.capture_method
-def get_summary(
-    request: Annotated[Users, Body(description="List of users")],
-) -> Annotated[str, Body(description="Summary of the list of users")]:
-    logger.info("Serving get_summary")
-
+def make_summary_tool(
+    request: UsersSummaryRequest,
+) -> str:
     users = request.users
 
     if len(users) == 0:

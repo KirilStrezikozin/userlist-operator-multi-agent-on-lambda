@@ -18,5 +18,5 @@ class Users(Base):
     users: Sequence[User]
 
 
-class UserDataFetchResult(Users):
-    summary: str
+class UsersSummaryRequest(Users):
+    pass
